@@ -6,8 +6,12 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🛠 Tillåt CORS från alla domäner (för testing)
-app.use(cors());
+// 🛠 Tillåt CORS för alla domäner (för testing)
+app.use(cors({
+    origin: "https://säkerid.se", // Byt till din frontend-URL i produktion, t.ex. "https://dinhemsida.com"
+    methods: ["GET"],
+    allowedHeaders: ["Content-Type", "hibp-api-key"]
+}));
 
 // 📌 Huvud-rout för att kolla breaches
 app.get("/check-breach", async (req, res) => {
@@ -17,7 +21,7 @@ app.get("/check-breach", async (req, res) => {
     }
 
     try {
-        const apiKey = process.env.HIBP_API_KEY; // Se till att denna finns i en `.env`-fil!
+        const apiKey = process.env.HIBP_API_KEY;
         const response = await fetch(`https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(email)}`, {
             method: "GET",
             headers: {
@@ -38,4 +42,6 @@ app.get("/check-breach", async (req, res) => {
 });
 
 // 🔥 Starta servern
-app.listen(PORT, () => console.log(`Servern körs på port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Servern körs på http://localhost:${PORT}`);
+});
